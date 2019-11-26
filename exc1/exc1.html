@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Liberation Sans";
+        }
+
+        header {
+            border: 1px solid black;
+            padding: 0 0 15px 0;
+            margin-bottom: 10px;
+        }
+
+        header ul{
+            margin: 0px;
+            padding: 10px;
+        }
+
+        header li{
+            float: left;
+            display: inline;
+            padding-right: 20px;
+            padding-left: 20px;
+        }
+
+        header a:hover{
+            color: #cccccc;
+            font-weight: bold;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+        }
+
+        menu {
+            border: 1px solid;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        menu ul {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+
+        menu ul li {
+            list-style-type: none;
+        }
+
+        .banner {
+            width: 50px;
+            heigh: 50px;
+            position: relative;
+            -webkit-animation-name: banner_move;
+            -webkit-animation-duration: 10s;
+            -webkit-animation-iteration-count: infinite;
+            -webkit-animation-direction: alternate;
+            animation-name: banner_move;
+            animation-duration: 10s;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            padding: 5%;
+        }
+
+        /* Safari 4.0 - 8.0 */
+        @-webkit-keyframes banner_move {
+            0%   {background-color:red; left: 5%; top:0px;}
+            25% {background-color:yellow; left: 85%; top:0px;}
+            50% {background-color:green; left: 5%; top:0px;}
+            75%   {background-color:blue; left: 85%; top:0px;}
+            100% {background-color:purple; left: 5%; top:0px;}
+        }
+
+        /* Standard syntax */
+        @keyframes banner_move {
+            0%   {background-color:red; left: 5%; top:0px;}
+            25% {background-color:yellow; left: 85%; top:0px;}
+            50% {background-color:green; left: 5%; top:0px;}
+            75%   {background-color:blue; left: 85%; top:0px;}
+            100% {background-color:purple; left: 5%; top:0px;}
+        }
+
+        .texts_under_banner {
+            display: flex;
+        }
+
+        .text {
+            margin: 0;
+            text-align: left;
+            padding: 10px;
+        }
+
+        .panoramic {
+            display:block;
+            margin:auto;
+            width: 80%;
+        }
+
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        footer img {
+            height: 100%;
+            width: 100%;
+        }
+
+        .dragable_picture {
+            width: 25%;
+            height: auto;
+            padding: 10px;
+            border: 1px solid black;
+            background: lightgoldenrodyellow;
+            align-content: center;
+        }
+
+        .drop {
+            width: 25%;
+            height: auto;
+            padding: 10px;
+            border: 1px solid black;
+            background: palegreen;
+            align-content: center;
+        }
+
+        @media only screen and (min-width: 768px) {
+            /* For tablets: */
+            main {
+                flex-direction: row;
+            }
+
+            menu {
+                flex-direction: column;
+                margin: 0 0 10px 0;
+                border: 1px solid black;
+                min-width: 17%;
+            }
+
+            menu ul {
+                flex-direction: column;
+                display: flex;
+                margin: 15px 0 0 20px;
+            }
+
+            menu li {
+                list-style-type: none;
+                padding: 10px 0;
+            }
+        }
+
+        @media only screen and (min-width: 992px) {
+            /* For desktop: */
+            header {
+                justify-content: flex-start;
+            }
+
+            header * {
+                padding-left: 10px;
+                padding-right: 3px;
+            }
+
+            main {
+                flex-direction: row;
+            }
+
+            menu {
+                flex-direction: column;
+                margin: 0 0 10px 0;
+                border: 1px solid black;
+                min-width: 13%;
+            }
+
+            menu ul {
+                flex-direction: column;
+                display: flex;
+                margin: 15px 0 0 20px;
+            }
+
+            menu li {
+                list-style-type: none;
+                padding: 10px 0;
+            }
+
+            footer {
+                flex-direction: row;
+                margin-top: 0;
+            }
+
+            .banner {
+                width: 5%;
+                padding: 3%;
+                font-size: 1em;
+            }
+
+            /* Safari 4.0 - 8.0 */
+            @-webkit-keyframes banner_move {
+                0%   {background-color:red; left: 1%; top:0px;}
+                25% {background-color:yellow; left: 90%; top:0px;}
+                50% {background-color:green; left: 1%; top:0px;}
+                75%   {background-color:blue; left: 90%; top:0px;}
+                100% {background-color:purple; left: 1%; top:0px;}
+            }
+
+            /* Standard syntax */
+            @keyframes banner_move {
+                0%   {background-color:red; left: 1%; top:0px;}
+                25% {background-color:yellow; left: 90%; top:0px;}
+                50% {background-color:green; left: 1%; top:0px;}
+                75%   {background-color:blue; left: 90%; top:0px;}
+                100% {background-color:purple; left: 1%; top:0px;}
+            }
+
+            .panoramic {
+                width: 45%;
+                max-height: 300px;
+            }
+        }
+    </style>
+
+    <script type="text/javascript">
+        function allowDrop(ev){
+            ev.preventDefault();
+        }
+
+        function dragStart(ev){
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function dropIt(ev){
+            ev.preventDefault();
+            let dataId = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(dataId));
+        }
+    </script>
+</head>
+
+<title>A Web Page</title>
+
+<body>
+    <header>
+        <div class="header">
+            <ul>
+                <li><a href="#file">File</a></li>
+                <li><a href="#edit">Edit</a></li>
+                <li><a href="#view">View</a></li>
+                <li><a href="#help">Help</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+        <menu>
+            <ul>
+                <li>Item 1</li>
+                <li>Item 2</li>
+                <li>Item 3</li>
+                <li>Item 4</li>
+            </ul>
+        </menu>
+        <section>
+            <section>
+                <div class="banner"></div>
+
+                <div class="texts_under_banner">
+                    <div class="text">
+                        <p>Mr. and Mrs. Dursley, of number four, Privet Drive, were proud to say that
+                            they were perfectly normal, thank you very much. They were the last people you'd
+                            expect to be involved in anything strange or mysterious, because they just didn't
+                            hold with such nonsense. Mr. Dursley was the director of a firm called Grunnings,
+                            which made drills. He was a big, beefy man with hardly any neck, although he did
+                            have a very large mustache. Mrs. Dursley was thin and blonde and had
+                            nearly twice the usual amount of neck, which came in very useful as she
+                            spent so much of her time craning over garden fences, spying on the
+                            neighbors. The Dursleys had a small son called Dudley and in their
+                            opinion there was no finer boy anywhere.</p>
+                    </div>
+                    <div class="text">
+                        <p>The Dursleys had everything they wanted, but they also had a secret, and
+                            their greatest fear was that somebody would discover it. They didn't
+                            think they could bear it if anyone found out about the Potters. Mrs.
+                            Potter was Mrs. Dursley's sister, but they hadn't met for several years;
+                            in fact, Mrs. Dursley pretended she didn't have a sister, because her
+                            sister and her good-for-nothing husband were as unDursleyish as it was
+                            possible to be. The Dursleys shuddered to think what the neighbors would
+                            say if the Potters arrived in the street. The Dursleys knew that the
+                            Potters had a small son, too, but they had never even seen him. This boy
+                            was another good reason for keeping the Potters away.</p>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <img class="panoramic" src="alhambra-.jpg" alt="Alhambra de Granada">
+
+                <div class="text">
+                    <p>Have you any idea how much tyrants fear the people they oppress?
+                        All of them realize that, one day, amongst their many victims, there is sure
+                        to be one that rises against them and strikes back!</p>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer>
+        <div class="drop" ondragover="allowDrop(event)" ondrop="dropIt(event)"></div>
+        <div class="dragable_picture" ondrop="dropIt(event)" ondragover="allowDrop(event)">
+            <img id="dog" src="dog.jpg" alt="Dog" draggable="true" ondragstart="dragStart(event)">
+        </div>
+        <div class="drop" ondragover="allowDrop(event)" ondrop="dropIt(event)"></div>
+    </footer>
+
+
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Code Decoder</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        header {
+            border: 1px solid black;
+            padding: 0 0 15px 0;
+            margin-bottom: 10px;
+        }
+
+        decode_area{
+            border: 1px solid;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        decode_area ul{
+            margin: 0px;
+            padding: 10px;
+        }
+
+        decode_area li{
+            list-style-type: none;
+        }
+
+        #inputField{
+            width: 50%;
+            max-width: 420px;
+        }
+
+        input[type=text]:focus {
+            /* lightgrey with 20% opacity to make the code more readable*/
+            background-color: rgba(211, 211, 211, 0.2);
+        }
+
+        footer {
+            margin: 100px 0;
+            justify-content: right;
+        }
+
+        #infoSection {
+            border: 1px solid black;
+            padding: 10px 0;
+            text-align: center;
+            background-color: lightblue;
+            margin: 10px;
+        }
+
+        .info_row {
+            padding-top: 0;
+            display: flex;
+            justify-content: left;
+        }
+
+        .text {
+            border: 1px solid grey;
+            width: 50%;
+            margin: 10px;
+            text-align: left;
+            padding: 10px;
+        }
+
+    </style>
+
+    <script>
+        function buttonPress(){
+            let version = document.getElementById("inputField").value.slice(0,1)
+            let account = document.getElementById("inputField").value.slice(1,17)
+            let amount = document.getElementById("inputField").value.slice(17,25)
+            let reference_number = document.getElementById("inputField").value.slice(25,48)
+            let due_date = document.getElementById("inputField").value.slice(48,54)
+
+            var correct_date = getDateCorrectFormat(due_date, version)
+            var total = getTotalCorrectFormat(amount)
+            var reference = getReferenceCorrectFormat(reference_number, version)
+            var account_number = getAccountCorrectFormat(account)
+
+            document.getElementById('due_date').innerHTML = correct_date;
+            document.getElementById('amount').innerHTML = total;
+            document.getElementById('reference').innerHTML = reference;
+            document.getElementById('IBAN').innerHTML = account_number;
+        }
+
+        function getDateCorrectFormat(due_date, version){
+            let correct_date;
+            if (due_date == "000000"){
+                correct_date = "None";
+            }
+            else if (version == "4") {
+                correct_date = due_date.slice(4, 6) + "." + due_date.slice(2, 4) + ".20" + due_date.slice(0, 2)
+            }
+            else {
+                let day, month, year
+                year = "20" + due_date.slice(0, 2)
+                // Day
+                if(due_date.slice(4, 5) == "0"){
+                    day = due_date.slice(5, 6)
+                }
+                else{
+                    day = due_date.slice(4, 6)
+                }
+                // Month
+                if(due_date.slice(2, 3) == "0"){
+                    month = due_date.slice(3, 4)
+                }
+                else{
+                    month = due_date.slice(2, 4)
+                }
+                correct_date = day + "." + month + "." + year
+            }
+            return correct_date
+        }
+
+        function getTotalCorrectFormat(total){
+            let amount = parseFloat(total).toFixed(2)
+            amount = amount / 100
+            amount = parseFloat(amount).toFixed(2)
+
+            if(amount.length > 6){
+                if(amount.length == 7)
+                    amount = amount.slice(0,1) + "," + amount.slice(1,8)
+                else if(amount.length == 8)
+                    amount = amount.slice(0,2) + "," + amount.slice(2,9)
+                else if(amount.length == 9)
+                    amount = amount.slice(0,3) + "," + amount.slice(3,10)
+            }
+
+            return amount
+        }
+
+        function getReferenceCorrectFormat(reference_number, version){
+            let reference = ""
+            if (version == 4){
+                let numbers = reference_number, n = reference_number.length
+                let first_digit_pos = 0, found = false
+                for(let i=0; i<n && !found; i++) {
+                    if (numbers[i] != 0) {
+                        found = true
+                        first_digit_pos = i
+                    }
+                }
+
+                numbers = numbers.slice(first_digit_pos, n)
+                n = numbers.length
+
+                let mod = n%5
+                reference = numbers.slice(0, mod)
+                numbers = numbers.slice(mod,n)
+                n = numbers.length
+
+                while(n>0){
+                    reference = reference + " " + numbers.slice(0, 5)
+                    numbers = numbers.slice(5,n)
+                    n = numbers.length
+                }
+
+
+                if (n!=0)
+                    reference = reference + " " + numbers
+            }
+            else if (version == 5){
+                reference = "RF" + reference_number.slice(0,2)
+                let numbers = reference_number.slice(2, reference_number.length)
+                let n = numbers.length
+
+                let first_digit_pos = 0, found = false
+                for(let i=0; i<n && !found; i++) {
+                    if (numbers[i] != 0) {
+                        found = true
+                        first_digit_pos = i
+                    }
+                }
+
+                numbers = numbers.slice(first_digit_pos, n)
+                n = numbers.length
+
+                for(let i=0; i<=n; i+=4){
+                    reference = reference + " " + numbers.slice(0, 4)
+                    numbers = numbers.slice(4, n)
+                    n = numbers.length
+                }
+                if (n!=0)
+                    reference = reference + " " + numbers
+
+            }
+
+            return reference
+        }
+
+        function getAccountCorrectFormat(account){
+            let account_number = account.slice(0,2), numbers = account.slice(2,account.length)
+
+            for(let i=0; i<4; i++){
+                account_number = account_number + " " + numbers.slice(0,4)
+                numbers = numbers.slice(4,numbers.length)
+            }
+
+            alert(account_number)
+            return account_number
+        }
+
+        function hideAndShow() {
+            var x = document.getElementById("infoSection");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+    <main>
+        <ul>
+            Virtual bar code:
+            <input id="inputField" type="text":focus>
+            <li>
+                <button onclick="buttonPress()">
+                    Decode
+                </button>
+
+                <div id="acc"></div>
+            </li>
+        </ul>
+    </main>
+
+    <footer>
+        <button onclick="hideAndShow()" class="buttonHide">
+            Hide
+        </button>
+        <div id="data">
+            <label>Payee's IBAN:</label>
+            <label id="ib"></label>
+            <label>Amount to be paid:</label>
+            <label id="amount"></label>
+            <label>Payment reference:</label>
+            <label id="reference"></label>
+            <label>Due date:</label>
+            <label id="due_date"></label>
+        </div>
+
+        <div id="infoSection">
+            <div class="info_row">
+                <div class="text">
+                    Payee's IBAN:
+                    <div id="IBAN"></div>
+                </div>
+                <div class="text">
+                    Amount to be paid:
+                </div>
+            </div>
+            <div class="info_row">
+                <div class="text">
+                    Payment reference:
+                </div>
+                <div class="text">
+                    Due date:
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
