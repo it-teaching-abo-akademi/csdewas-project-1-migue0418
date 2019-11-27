@@ -8,83 +8,143 @@
             box-sizing: border-box;
         }
 
-        header {
-            border: 1px solid black;
+        main {
             padding: 0 0 15px 0;
-            margin-bottom: 10px;
+            margin-top: 60px;
         }
 
-        decode_area{
-            border: 1px solid;
-            padding: 5px;
-            margin-bottom: 20px;
-        }
-
-        decode_area ul{
-            margin: 0px;
+        main ul{
+            margin: 20px;
             padding: 10px;
         }
 
-        decode_area li{
+        main li{
+            margin: 10px 0 0 110px;
             list-style-type: none;
         }
 
         #inputField{
-            width: 50%;
+            width: 70%;
             max-width: 420px;
         }
 
         input[type=text]:focus {
             /* lightgrey with 20% opacity to make the code more readable*/
-            background-color: rgba(211, 211, 211, 0.2);
+            background-color: rgba(211, 211, 211, 0.4);
         }
 
         footer {
-            margin: 100px 0;
-            justify-content: right;
+            margin: 40px 0;
+            display: block;
+        }
+
+        footer ul{
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .button {
+            padding: 5px 20px;
         }
 
         #infoSection {
             border: 1px solid black;
             padding: 10px 0;
-            text-align: center;
-            background-color: lightblue;
-            margin: 10px;
-        }
-
-        .info_row {
-            padding-top: 0;
-            display: flex;
-            justify-content: left;
-        }
-
-        .text {
-            border: 1px solid grey;
-            width: 50%;
-            margin: 10px;
             text-align: left;
-            padding: 10px;
+            margin: 10px;
+        }
+
+        #barcode {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #barcode img {
+            border: none;
+            width: 90%;
+        }
+
+        #infoDecoded {
+            display: grid;
+            grid-template-columns: 45% 45%;
+            grid-row-gap: 30px;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        #data li{
+            list-style-type: none;
+        }
+        @media only screen and (min-width: 768px) {
+            /* For tablets: */
+            #infoDecoded {
+                margin-left: 30px;
+                display: grid;
+                grid-template-columns: 25% 25% 25% 25%;
+                padding: 25px;
+            }
+
+            #barcode img {
+                max-width: 70%;
+                max-height: 160px;
+            }
+        }
+
+        @media only screen and (min-width: 992px) {
+            /* For desktop: */
+            #infoDecoded {
+                margin-left: 30px;
+                display: grid;
+                grid-template-columns: 25% 25% 25% 25%;
+                padding: 25px;
+            }
+
+            #barcode img {
+                max-width: 70%;
+                max-height: 160px;
+            }
         }
 
     </style>
-
-    <script>
+    <script src="JsBarcode.code128.min.js"></script>
+    <script >
         function buttonPress(){
-            let version = document.getElementById("inputField").value.slice(0,1)
-            let account = document.getElementById("inputField").value.slice(1,17)
-            let amount = document.getElementById("inputField").value.slice(17,25)
-            let reference_number = document.getElementById("inputField").value.slice(25,48)
-            let due_date = document.getElementById("inputField").value.slice(48,54)
+            if(checkIfValid(document.getElementById("inputField").value)) {
+                let version = document.getElementById("inputField").value.slice(0, 1)
+                let account = document.getElementById("inputField").value.slice(1, 17)
+                let amount = document.getElementById("inputField").value.slice(17, 25)
+                let reference_number = document.getElementById("inputField").value.slice(25, 48)
+                let due_date = document.getElementById("inputField").value.slice(48, 54)
 
-            var correct_date = getDateCorrectFormat(due_date, version)
-            var total = getTotalCorrectFormat(amount)
-            var reference = getReferenceCorrectFormat(reference_number, version)
-            var account_number = getAccountCorrectFormat(account)
+                var correct_date = getDateCorrectFormat(due_date, version)
+                var total = getTotalCorrectFormat(amount)
+                var reference = getReferenceCorrectFormat(reference_number, version)
+                var account_number = getAccountCorrectFormat(account)
 
-            document.getElementById('due_date').innerHTML = correct_date;
-            document.getElementById('amount').innerHTML = total;
-            document.getElementById('reference').innerHTML = reference;
-            document.getElementById('IBAN').innerHTML = account_number;
+                document.getElementById("due_date").innerHTML = correct_date;
+                document.getElementById("amount").innerHTML = total;
+                document.getElementById("reference").innerHTML = reference;
+                document.getElementById("IBAN").innerHTML = account_number;
+
+                JsBarcode("#bcode", document.getElementById("inputField").value);
+            }
+            else{
+                alert("ERROR: The barcode cannot be decoded.")
+            }
+        }
+
+        function checkIfValid(barcode) {
+            let isValid = true;
+            let version = document.getElementById("inputField").value.slice(0, 1)
+
+            if(barcode.length != 54)
+                isValid = false;
+
+            else if(version != "4" && version !="5")
+                isValid = false;
+
+            return isValid;
         }
 
         function getDateCorrectFormat(due_date, version){
@@ -201,17 +261,21 @@
                 numbers = numbers.slice(4,numbers.length)
             }
 
-            alert(account_number)
             return account_number
         }
 
-        function hideAndShow() {
-            var x = document.getElementById("infoSection");
-            if (x.style.display === "none") {
-                x.style.display = "block";
-            } else {
-                x.style.display = "none";
-            }
+        function show() {
+            let info = document.getElementById("infoSection");
+            info.style.display = "block";
+            document.getElementById("button-hide-show").innerText = "Hide";
+            document.getElementById("button-hide-show").setAttribute("onClick", "javascript: hide();");
+        }
+
+        function hide() {
+            let info = document.getElementById("infoSection");
+            info.style.display = "none";
+            document.getElementById("button-hide-show").innerText = "Show";
+            document.getElementById("button-hide-show").setAttribute("onClick", "javascript: show();");
         }
 
     </script>
@@ -223,49 +287,35 @@
             Virtual bar code:
             <input id="inputField" type="text":focus>
             <li>
-                <button onclick="buttonPress()">
+                <button onclick="buttonPress()" class="button">
                     Decode
                 </button>
-
-                <div id="acc"></div>
             </li>
         </ul>
     </main>
 
     <footer>
-        <button onclick="hideAndShow()" class="buttonHide">
-            Hide
-        </button>
-        <div id="data">
-            <label>Payee's IBAN:</label>
-            <label id="ib"></label>
-            <label>Amount to be paid:</label>
-            <label id="amount"></label>
-            <label>Payment reference:</label>
-            <label id="reference"></label>
-            <label>Due date:</label>
-            <label id="due_date"></label>
-        </div>
+        <ul>
+            <button id="button-hide-show" class="button" onclick="hide()">Hide</button>
+        </ul>
 
         <div id="infoSection">
-            <div class="info_row">
-                <div class="text">
-                    Payee's IBAN:
-                    <div id="IBAN"></div>
-                </div>
-                <div class="text">
-                    Amount to be paid:
-                </div>
+            <div id="infoDecoded">
+                <div>Payee's IBAN:</div>
+                <div id="IBAN"></div>
+                <div>Amount to be paid:</div>
+                <div id="amount"></div>
+                <div>Payment reference:</div>
+                <div id="reference"></div>
+                <div>Due date:</div>
+                <div id="due_date"></div>
             </div>
-            <div class="info_row">
-                <div class="text">
-                    Payment reference:
-                </div>
-                <div class="text">
-                    Due date:
-                </div>
+
+            <div id="barcode">
+                <img id="bcode"/>
             </div>
         </div>
+
     </footer>
 </body>
 </html>
